@@ -8,6 +8,6 @@ WriteMakefile(
   NAME => 'Parallel::Map',
   VERSION_FROM => 'lib/Parallel/Map.pm',
   PREREQ_PM => {
-    'IO::Async' => '0,75',
+    'IO::Async' => '0.75',
   },
 );
