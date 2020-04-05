@@ -16,18 +16,17 @@ our @EXPORT = qw(pmap_void pmap_scalar pmap_concat);
 sub _pmap {
   my ($type, $code, %args) = @_;
 
-  return "Invalid type ${type}" unless $type =~ /^(?:void|scalar|concat)$/;
+  die "Invalid type ${type}"
+    unless my $fmap = Future::Utils->can("fmap_${type}");
 
   $args{concurrent} = delete $args{forks} if $args{forks};
 
   my $par = $args{concurrent} ||= 5;
 
   my $func = IO::Async::Function->new(code => $code);
-  $func->configure(max_workers => $par||$func->{max_workers});
+  $func->configure(max_workers => $par);
 
   (my $loop = IO::Async::Loop->new)->add($func);
-
-  my $fmap = Future::Utils->can("fmap_${type}");
 
   my $done_f = $fmap->(
     sub { $func->call(args => [ @_ ]) },
