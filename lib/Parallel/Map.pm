@@ -66,18 +66,18 @@ All subroutines match L<Future::Utils> C<fmap_> subroutines of the same name.
 
 =head2 pmap_void
 
-  pmap_void { <block returning future> } foreach => \@input;
-  pmap_void { <block returning future> } generate => sub { <iterator> }
+  pmap_void { <block> } foreach => \@input;
+  pmap_void { <block> } generate => sub { <iterator> }
 
 =head2 pmap_scalar
 
-  pmap_scalar { <block returning future> } foreach => \@input;
-  pmap_scalar { <block returning future> } generate => sub { <iterator> }
+  pmap_scalar { <block> } foreach => \@input;
+  pmap_scalar { <block> } generate => sub { <iterator> }
 
 =head2 pmap_concat
 
-  pmap_concat { <block returning future> } foreach => \@input;
-  pmap_concat { <block returning future> } generate => sub { <iterator> }
+  pmap_concat { <block> } foreach => \@input;
+  pmap_concat { <block> } generate => sub { <iterator> }
 
 =head1 AUTHOR
 
