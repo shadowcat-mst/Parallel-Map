@@ -21,7 +21,7 @@ sub _pmap {
 
   my $par = $args{concurrent} ||= 5;
 
-  my $func = IO::Function->new(code => $code);
+  my $func = IO::Async::Function->new(code => $code);
   $func->configure(max_workers => $par||$func->{max_workers});
 
   (my $loop = IO::Async::Loop->new)->add($func);
