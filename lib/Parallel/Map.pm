@@ -8,6 +8,7 @@ use strict;
 use warnings;
 use IO::Async::Function;
 use IO::Async::Loop;
+use Future::Utils;
 use Exporter 'import';
 
 our @EXPORT = qw(pmap_void pmap_scalar pmap_concat);
