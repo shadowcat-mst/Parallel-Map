@@ -16,7 +16,8 @@ sub pmap_void   (&;@) { _pmap void => @_ }
 sub pmap_scalar (&;@) { _pmap scalar => @_ }
 sub pmap_concat (&;@) { _pmap concat => @_ }
 
-sub _pmap ($type, $code, %args) {
+sub _pmap {
+  my ($type, $code, %args) = @_;
 
   return "Invalid type ${type}" unless $type =~ /^(?:void|scalar|concat)$/;
 
