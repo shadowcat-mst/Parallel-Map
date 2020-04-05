@@ -12,10 +12,6 @@ use Exporter 'import';
 
 our @EXPORT = qw(pmap_void pmap_scalar pmap_concat);
 
-sub pmap_void   (&;@) { _pmap void => @_ }
-sub pmap_scalar (&;@) { _pmap scalar => @_ }
-sub pmap_concat (&;@) { _pmap concat => @_ }
-
 sub _pmap {
   my ($type, $code, %args) = @_;
 
@@ -34,7 +30,7 @@ sub _pmap {
 
   my $done_f = $fmap->(
     sub { $func->call(args => [ @_ ]) },
-    %args.
+    %args,
   );
 
   my $final_f = $loop->await($done_f);
@@ -43,6 +39,10 @@ sub _pmap {
 
   return $final_f->get;
 }
+
+sub pmap_void   (&;@) { _pmap void => @_ }
+sub pmap_scalar (&;@) { _pmap scalar => @_ }
+sub pmap_concat (&;@) { _pmap concat => @_ }
 
 1;
 
