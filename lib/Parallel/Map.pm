@@ -19,23 +19,29 @@ sub _pmap {
   die "Invalid type ${type}"
     unless my $fmap = Future::Utils->can("fmap_${type}");
 
-  $args{concurrent} = delete $args{forks} if $args{forks};
+  $args{concurrent} = delete $args{forks} if exists $args{forks};
 
-  my $par = $args{concurrent} ||= 5;
+  my $loop = IO::Async::Loop->new;
 
-  my $func = IO::Async::Function->new(code => $code);
-  $func->configure(max_workers => $par);
+  my ($call, $func) = do {
+    if (my $par = $args{concurrent} //= 5) {
+      my $func = IO::Async::Function->new(code => $code);
+      $func->configure(max_workers => $par);
+      $loop->add($func);
+      (sub { $func->call(args => [ @_ ]) }, $func);
+    } else {
+      (sub { Future->done($code->(@_)) });
+    }
+  };
 
-  (my $loop = IO::Async::Loop->new)->add($func);
-
-  my $done_f = $fmap->(
-    sub { $func->call(args => [ @_ ]) },
-    %args,
-  );
+  my $done_f = $fmap->($call, %args);
 
   my $final_f = $loop->await($done_f);
-  $loop->await($func->stop);
-  $loop->remove($func);
+
+  if ($func) {
+    $loop->await($func->stop);
+    $loop->remove($func);
+  }
 
   return $final_f->get;
 }
