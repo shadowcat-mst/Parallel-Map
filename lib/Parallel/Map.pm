@@ -31,13 +31,22 @@ sub _pmap {
   my $loop = IO::Async::Loop->new;
 
   my ($call, $func) = do {
+    my $wrapped = do {
+      my $base_w = sub { local $_ = $_[0]; $code->($_[0]) };
+      ($type eq 'scalar'
+        ? sub { scalar $base_w->(@_) }
+        : ($type eq 'void'
+            ? sub { $base_w->(@_); return }
+            : $base_w)
+      );
+    };
     if (my $par = $args{concurrent} //= 5) {
-      my $func = IO::Async::Function->new(code => $code);
+      my $func = IO::Async::Function->new(code => $wrapped);
       $func->configure(max_workers => $par);
       $loop->add($func);
       (sub { $func->call(args => [ @_ ]) }, $func);
     } else {
-      (sub { Future->done($code->(@_)) });
+      (sub { Future->done($wrapped->(@_)) });
     }
   };
 
