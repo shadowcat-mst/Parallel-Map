@@ -14,10 +14,17 @@ use Exporter 'import';
 our @EXPORT = qw(pmap_void pmap_scalar pmap_concat);
 
 sub _pmap {
-  my ($type, $code, %args) = @_;
+  my ($type, $code, @rest) = @_;
 
   die "Invalid type ${type}"
     unless my $fmap = Future::Utils->can("fmap_${type}");
+
+  if (ref($rest[0]) eq 'ARRAY') {
+    push @rest, foreach => shift(@rest);
+  } elsif (ref($rest[0]) eq 'CODE') {
+    push @rest, generate => shift(@rest);
+  }
+  my %args = @rest;
 
   $args{concurrent} = delete $args{forks} if exists $args{forks};
 
