@@ -6,6 +6,7 @@ $VERSION = eval $VERSION;
 
 use strict;
 use warnings;
+use Carp;
 use IO::Async::Function;
 use IO::Async::Loop;
 use Future::Utils;
@@ -13,10 +14,19 @@ use Exporter 'import';
 
 our @EXPORT = qw(pmap_void pmap_scalar pmap_concat);
 
+my %valid_keys = map +($_ => 1), qw(foreach generate forks concurrent);
+
+my %excludes_key = (
+  foreach => 'generate',
+  generate => 'foreach',
+  forks => 'concurrent',
+  concurrent => 'forks',
+);
+
 sub _pmap {
   my ($type, $code, @rest) = @_;
 
-  die "Invalid type ${type}"
+  croak "Invalid Parallel::Map type ${type}"
     unless my $fmap = Future::Utils->can("fmap_${type}");
 
   if (ref($rest[0]) eq 'ARRAY') {
@@ -24,7 +34,21 @@ sub _pmap {
   } elsif (ref($rest[0]) eq 'CODE') {
     push @rest, generate => shift(@rest);
   }
+
+  croak "Uneven Parallel::Map args" if @rest % 2;
+
   my %args = @rest;
+
+  if (my @invalid = grep !$valid_keys{$_}, keys %args) {
+    croak "Invalid keys for Parallel::Map: ".join(', ', @invalid);
+  }
+
+  foreach my $key (keys %args) {
+    if (my $excluded = $excludes_key{$key}) {
+      croak "Can't pass Parallel::Map both ${key} and ${excluded}"
+        if exists $args{$excluded};
+    }
+  }
 
   $args{concurrent} = delete $args{forks} if exists $args{forks};
 
