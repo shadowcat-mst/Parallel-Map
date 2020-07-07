@@ -10,4 +10,8 @@ WriteMakefile(
   PREREQ_PM => {
     'IO::Async' => '0.75',
   },
+  TEST_REQUIRES => {
+    'Test::Exception' => 0,
+    'Test::Warnings' => 0,
+  },
 );
