@@ -18,8 +18,6 @@ my %valid_keys = map +($_ => 1), qw(foreach generate forks concurrent);
 
 my %excludes_key = (
   foreach => 'generate',
-  generate => 'foreach',
-  forks => 'concurrent',
   concurrent => 'forks',
 );
 
