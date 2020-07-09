@@ -62,7 +62,8 @@ sub _pmap {
             : $base_w)
       );
     };
-    if (my $par = $args{concurrent} //= 5) {
+    if (!$ENV{PERL_PARALLEL_MAP_NO_FORK}
+        and my $par = $args{concurrent} //= 5) {
       my $func = IO::Async::Function->new(code => $wrapped);
       $func->configure(max_workers => $par);
       $loop->add($func);

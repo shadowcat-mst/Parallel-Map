@@ -28,4 +28,12 @@ is @shared, 10, "data lands in subprocess shared variable";
 
 ok !(grep $_->{pid} != $$, @shared), "no forking with forks => 0";
 
+@shared = do { local $ENV{PERL_PARALLEL_MAP_NO_FORK} = 1; pmap_scalar {
+  return { num => $_[0], pid => $$ };
+} foreach => [1..10], forks => 3 };
+
+is @shared, 10, "data lands in subprocess shared variable";
+
+ok !(grep $_->{pid} != $$, @shared), "no forking with env var set";
+
 done_testing;
