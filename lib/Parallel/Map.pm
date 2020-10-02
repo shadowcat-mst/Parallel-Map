@@ -114,15 +114,21 @@ All subroutines match L<Future::Utils> C<fmap_> subroutines of the same name.
   pmap_void { <block> } foreach => \@input;
   pmap_void { <block> } generate => sub { <iterator> }
 
+A parallel variant of L<Future::Utils/fmap_void>.
+
 =head2 pmap_scalar
 
   pmap_scalar { <block> } foreach => \@input;
   pmap_scalar { <block> } generate => sub { <iterator> }
 
+A parallel variant of L<Future::Utils/fmap_scalar>.
+
 =head2 pmap_concat
 
   pmap_concat { <block> } foreach => \@input;
   pmap_concat { <block> } generate => sub { <iterator> }
+
+A parallel variant of L<Future::Utils/fmap_concat>.
 
 =head1 AUTHOR
 
